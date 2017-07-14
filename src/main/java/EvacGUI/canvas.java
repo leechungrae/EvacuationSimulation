@@ -12,17 +12,16 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
 	int wall_height = 500;
     boolean bg_change=false;
     int color=254,incr=1;
- 
     //a   array
-    ArrayList<ball> ballarray;
+    static ArrayList<ball> ballarray;
     ArrayList<ball> tempballarray;
+    ball temp_ball = new ball(20);
     //my custom box
     
     My_box b1,b2,b3,b4,b5;
  
     canvas()
     {
-    	
         ballarray=new ArrayList(1);
         b1=new My_box(0,0,wall_width,10);//top(-)
         b2=new My_box(0,0,10,wall_height);//top-right(|)
@@ -35,7 +34,8 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         b4.setLocation((wall_width/2)+40,wall_height);
         b5.setLocation(0,0);
         addKeyListener(this);
-        addMouseMotionListener(this); 
+        addMouseMotionListener(this);
+ 
         setPreferredSize(new Dimension(width,height));
         setFocusable(true);
     }
@@ -54,10 +54,10 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     }
  
     //add a new ball by passing a "ball" class instance
-    public void addBall(int size)
+    public void addBall()
     {
         //added to the arraylist
-    	ball temp_ball = new ball(size);
+    	ball temp_ball = new ball(20);
     	temp_ball.x_pos=(int) (Math.random()*wall_width%(wall_width-10));
     	temp_ball.y_pos= (int) (Math.random()*wall_height%(wall_height-10));
         ballarray.add(temp_ball);
@@ -109,13 +109,14 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         b3.drawBox(g);
         b4.drawBox(g);
         b5.drawBox(g);
+        ball evac_ball = new ball(20);
         try{
             Thread.sleep(5);
             for(ball temp_ball: ballarray)
             {
                 //drawing the ball using "drawBall(Graphics g,boolean)".
                 //boolean is for displaying ball's bounding rectangle which deals with collision
-            	temp_ball.drawBall(g, false);
+            	temp_ball.drawBall(g,false);
               //******************************************************************** check touching part
                 //checking for collision with our movable pad
                 temp_ball.collision(b1);
@@ -123,19 +124,20 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
                 temp_ball.collision(b3);
                 temp_ball.collision(b4);
                 temp_ball.collision(b5);
-                
-                //if ball is out of the wall, remove the ball from the Array.
                 if(temp_ball.y_pos>(wall_height+20)){
                 	tempballarray = ballarray;
+                	evac_ball = temp_ball;
                 	tempballarray.remove(temp_ball);
-                    repaint();//calls the paint method
+                	base_frame.ballremoved();
                 	System.out.println("removed a ball!");
+                	repaint();//calls the paint method
                 } 
                 
               //******************************************************************** check touching part
             }
             if(tempballarray!=null){
             	ballarray=tempballarray;
+            	ballarray.remove(evac_ball);
             }
             repaint();//calls the paint method
  
