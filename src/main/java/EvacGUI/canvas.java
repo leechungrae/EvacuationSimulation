@@ -16,23 +16,26 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     static ArrayList<ball> ballarray;
     ArrayList<ball> tempballarray;
     ball temp_ball = new ball(20);
+    ball evac_ball = new ball(20);
     int time_counter=0;
     //my custom box
     
-    My_box b1,b2,b3,b4,b5;
+    My_box b1,b2,b3,b4,b5,wall1;
  
     canvas()
     {
         ballarray=new ArrayList(1);
         b1=new My_box(0,0,wall_width,10);//top(-)
         b2=new My_box(0,0,10,wall_height);//top-right(|)
-        b3=new My_box(0,0,(wall_width/2)-30,10);//bottom-left(-)
-        b4=new My_box(0,0,(wall_width/2)-30,10);//bottom-right(-)
+        b3=new My_box(0,0,wall_width,10);//bottom-left(-)
+        //b4=new My_box(0,0,(wall_width/2)-30,10);//bottom-right(-)
         b5=new My_box(0,0,10,wall_height);//top-left(|)
+        wall1=new My_box(400,wall_height-5,60, 20);//top-left(|)
+        
         b1.setLocation(0,0);
         b2.setLocation(wall_width,0);
         b3.setLocation(0,wall_height);
-        b4.setLocation((wall_width/2)+40,wall_height);
+        //b4.setLocation((wall_width/2)+40,wall_height);
         b5.setLocation(0,0);
         addKeyListener(this);
         addMouseMotionListener(this);
@@ -73,6 +76,22 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             ballarray.remove(ballarray.size()-1);
         }
     }
+    
+    public void removeExitBall(){
+    	 //checking for exit wall collision with our movable
+          tempballarray = ballarray;
+          evac_ball = temp_ball;
+          tempballarray.remove(temp_ball);
+          base_frame.ballremoved();
+          System.out.println("removed a ball!");
+          //repaint();//calls the paint method
+          if(tempballarray!=null){
+              ballarray=tempballarray;
+              ballarray.remove(evac_ball);
+          }
+          repaint();//calls the paint method
+    }
+    
     public int getBallCount()
     {
             return ballarray.size();
@@ -105,11 +124,14 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
  
         //my box
         g.setColor(Color.BLACK);
-        b1.drawBox(g);
-        b2.drawBox(g);
-        b3.drawBox(g);
-        b4.drawBox(g);
-        b5.drawBox(g);
+        b1.drawBox(g, "red");
+        b2.drawBox(g, "red");
+        b3.drawBox(g, "red");
+        //b4.drawBox(g, "red");
+        b5.drawBox(g, "red");
+        wall1.drawBox(g,  "green");
+        
+        
         ball evac_ball = new ball(20);
         try{
             Thread.sleep(5);
@@ -120,16 +142,21 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             for(ball temp_ball: ballarray)
             {
                 //drawing the ball using “drawBall(Graphics g,boolean)“.
-                //boolean is for displaying ball’s bounding rectangle which deals with collision
+                //boolean is for displaying ball’s bounding rectangle which deals with 
                 temp_ball.drawBall(g,false);
               //******************************************************************** check touching part
                 //checking for collision with our movable pad
                 temp_ball.collision(b1);
                 temp_ball.collision(b2);
                 temp_ball.collision(b3);
-                temp_ball.collision(b4);
+                //temp_ball.collision(b4);
                 temp_ball.collision(b5);
-                if(temp_ball.y_pos>(wall_height+20)){
+                //temp_ball.collisionExit(wall1);
+                
+                //벽 추가 버튼을 누르면 리스트에 둬서 리스트를 차례로 번갈아가면서 확인하는 것으로 바꾸면 됨
+                
+                //checking for exit wall collision with our movable
+                if(temp_ball.collisionExit(wall1)){
                     tempballarray = ballarray;
                     evac_ball = temp_ball;
                     tempballarray.remove(temp_ball);
@@ -199,7 +226,16 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         {
             this.size=size;
         }
- 
+        
+        public void removeBall()
+        {
+            if(!ballarray.isEmpty())
+            {
+            	
+                ballarray.remove(ballarray.size()-1);
+            }
+        }
+        
         private void calculate_direction()
         {
             //move the ball
@@ -256,7 +292,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             }
         }
  
-        public void drawBall(Graphics g,boolean bound)
+        public void drawBall(Graphics g, boolean bound)
         {
             calculate_direction();
             g.setColor(Color.BLUE);
@@ -272,11 +308,10 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         {
             return new Rectangle(x_pos,y_pos,size,size);
         }
- 
                 //this method is called for all balls and checked whether it touches the rect.if so,the ball’s direction gets changed accordingly.
         public void collision(My_box rect)
         {
-                           //if ball collides with top/bottom part of the rect
+            //if ball collides with top/bottom part of the rect
             if(this.getRectBounds().intersectsLine(rect.x,rect.y,rect.x+rect.width,rect.y) ||
                            this.getRectBounds().intersectsLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y+rect.height))
             {
@@ -285,14 +320,31 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
  
             }
  
-              //if ball collides with left/right part of the rect
+             //if ball collides with left/right part of the rect
             if(this.getRectBounds().intersectsLine(rect.x,rect.y    ,    rect.x,rect.y+rect.height) ||
                            this.getRectBounds().intersectsLine(rect.x+rect.width,rect.y  ,   rect.x+rect.width,rect.y+rect.height))
             {
                 changeDirection_X();//reverses the direction along X
- 
             }
- 
+        }
+        
+        public Boolean collisionExit(My_box rect){
+        	//if ball collides with top/bottom part of the exit rect
+        	if(this.getRectBounds().intersectsLine(rect.x,rect.y,rect.x+rect.width,rect.y) ||
+                    this.getRectBounds().intersectsLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y+rect.height))
+		     {
+        		//removeExitBall();//reverses the direction along Y
+        		return true;
+		     }
+        	 
+        	//if ball collides with left/right part of the exit rect
+            if(this.getRectBounds().intersectsLine(rect.x,rect.y    ,    rect.x,rect.y+rect.height) ||
+                           this.getRectBounds().intersectsLine(rect.x+rect.width,rect.y  ,   rect.x+rect.width,rect.y+rect.height))
+            {
+            	//removeExitBall();//reverses the direction along X
+            	return true;
+            }
+        	return false;
         }
     }
 }

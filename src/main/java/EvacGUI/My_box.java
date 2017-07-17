@@ -12,9 +12,11 @@ class My_box extends Rectangle
         super(x1,y,width,height);
     }
  
-    public void drawBox(Graphics g)
+    public void drawBox(Graphics g, String scolor)
     {
-        g.setColor(Color.RED);
+    	if(scolor == "red") g.setColor(Color.RED);
+    	if(scolor == "green") g.setColor(Color.GREEN);
+    	if(scolor == "white") g.setColor(Color.WHITE);
         g.fillRect(x,y,width,height);
     }
 }
