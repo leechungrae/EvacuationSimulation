@@ -17,6 +17,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     static ArrayList<ball> ballarray;
     ArrayList<ball> tempballarray;
     ball temp_ball = new ball(20);
+    //master test
     //my custom box
     
     My_box b1,b2,b3,b4,b5;
