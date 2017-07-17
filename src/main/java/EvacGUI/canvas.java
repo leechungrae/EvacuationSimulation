@@ -27,7 +27,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         ballarray=new ArrayList(1);
         b1=new My_box(0,0,wall_width,10);//top(-)
         b2=new My_box(0,0,10,wall_height);//top-right(|)
-        b3=new My_box(0,0,wall_width,10);//bottom-left(-)
+        b3=new My_box(0,0,wall_width+10,10);//bottom-left(-)
         //b4=new My_box(0,0,(wall_width/2)-30,10);//bottom-right(-)
         b5=new My_box(0,0,10,wall_height);//top-left(|)
         wall1=new My_box(400,wall_height-5,60, 20);//top-left(|)
@@ -312,8 +312,8 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         public void collision(My_box rect)
         {
             //if ball collides with top/bottom part of the rect
-            if(this.getRectBounds().intersectsLine(rect.x,rect.y,rect.x+rect.width,rect.y) ||
-                           this.getRectBounds().intersectsLine(rect.x,rect.y+rect.height, rect.x+rect.width,rect.y+rect.height))
+            if(this.getRectBounds().intersectsLine(rect.x,rect.y,rect.x+rect.width+10,rect.y) ||
+                           this.getRectBounds().intersectsLine(rect.x,rect.y+rect.height, rect.x+rect.width+10,rect.y+rect.height))
             {
  
                 changeDirection_Y();//reverses the direction along Y
@@ -321,7 +321,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             }
  
              //if ball collides with left/right part of the rect
-            if(this.getRectBounds().intersectsLine(rect.x,rect.y    ,    rect.x,rect.y+rect.height) ||
+            if(this.getRectBounds().intersectsLine(rect.x,rect.y    ,    rect.x,rect.y+rect.height+5) ||
                            this.getRectBounds().intersectsLine(rect.x+rect.width,rect.y  ,   rect.x+rect.width,rect.y+rect.height))
             {
                 changeDirection_X();//reverses the direction along X

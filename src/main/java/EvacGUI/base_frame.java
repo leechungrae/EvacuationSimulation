@@ -25,7 +25,7 @@ public class base_frame extends JFrame implements ActionListener {
     // ********************************************************************
     // define
     base_frame() {
-        super("Ball Bounds");
+        super("Evacuation Simulation Based on Agent System");
         // our UI panel which contains gui comps
         ui_panel = new JPanel();
         b_changebg = new JButton("Change Background");
