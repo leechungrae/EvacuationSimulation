@@ -6,8 +6,8 @@ import javax.swing.*;
 public class canvas extends JComponent implements KeyListener,MouseMotionListener
 {
     //display details
-    private final int width=900;
-    private final int height=700;
+    private final int width=1100;
+    private final int height=600;
     int wall_width = 800;
     int wall_height = 500;
     boolean bg_change=false;
