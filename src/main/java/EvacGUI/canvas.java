@@ -6,18 +6,17 @@ import javax.swing.*;
 public class canvas extends JComponent implements KeyListener,MouseMotionListener
 {
     //display details
-	//TESTSETSETSETSETSETSETSETSET
     private final int width=900;
     private final int height=700;
     int wall_width = 800;
-	int wall_height = 500;
+    int wall_height = 500;
     boolean bg_change=false;
     int color=254,incr=1;
     //a   array
     static ArrayList<ball> ballarray;
     ArrayList<ball> tempballarray;
     ball temp_ball = new ball(20);
-    //master test
+    int time_counter=0;
     //my custom box
     
     My_box b1,b2,b3,b4,b5;
@@ -55,13 +54,13 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         }
     }
  
-    //add a new ball by passing a "ball" class instance
+    //add a new ball by passing a “ball” class instance
     public void addBall()
     {
         //added to the arraylist
-    	ball temp_ball = new ball(20);
-    	temp_ball.x_pos=(int) (Math.random()*wall_width%(wall_width-10));
-    	temp_ball.y_pos= (int) (Math.random()*wall_height%(wall_height-10));
+        ball temp_ball = new ball(20);
+        temp_ball.x_pos=(int) (Math.random()*wall_width%(wall_width-10));
+        temp_ball.y_pos= (int) (Math.random()*wall_height%(wall_height-10));
         ballarray.add(temp_ball);
         base_frame.balladded();
         
@@ -114,11 +113,15 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         ball evac_ball = new ball(20);
         try{
             Thread.sleep(5);
+            time_counter=time_counter+5;
+            if(time_counter%1000==0&&base_frame.startflag==1){
+                base_frame.timercount();
+            }
             for(ball temp_ball: ballarray)
             {
-                //drawing the ball using "drawBall(Graphics g,boolean)".
-                //boolean is for displaying ball's bounding rectangle which deals with collision
-            	temp_ball.drawBall(g,false);
+                //drawing the ball using “drawBall(Graphics g,boolean)“.
+                //boolean is for displaying ball’s bounding rectangle which deals with collision
+                temp_ball.drawBall(g,false);
               //******************************************************************** check touching part
                 //checking for collision with our movable pad
                 temp_ball.collision(b1);
@@ -127,19 +130,19 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
                 temp_ball.collision(b4);
                 temp_ball.collision(b5);
                 if(temp_ball.y_pos>(wall_height+20)){
-                	tempballarray = ballarray;
-                	evac_ball = temp_ball;
-                	tempballarray.remove(temp_ball);
-                	base_frame.ballremoved();
-                	System.out.println("removed a ball!");
-                	repaint();//calls the paint method
+                    tempballarray = ballarray;
+                    evac_ball = temp_ball;
+                    tempballarray.remove(temp_ball);
+                    base_frame.ballremoved();
+                    System.out.println("removed a ball!");
+                    repaint();//calls the paint method
                 } 
                 
               //******************************************************************** check touching part
             }
             if(tempballarray!=null){
-            	ballarray=tempballarray;
-            	ballarray.remove(evac_ball);
+                ballarray=tempballarray;
+                ballarray.remove(evac_ball);
             }
             repaint();//calls the paint method
  
@@ -270,7 +273,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             return new Rectangle(x_pos,y_pos,size,size);
         }
  
-                //this method is called for all balls and checked whether it touches the rect.if so,the ball's direction gets changed accordingly.
+                //this method is called for all balls and checked whether it touches the rect.if so,the ball’s direction gets changed accordingly.
         public void collision(My_box rect)
         {
                            //if ball collides with top/bottom part of the rect
