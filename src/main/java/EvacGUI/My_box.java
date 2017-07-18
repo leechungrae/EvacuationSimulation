@@ -11,7 +11,8 @@ class My_box extends Rectangle
     {
         super(x1,y,width,height);
     }
- 
+    
+    
     public void drawBox(Graphics g, String scolor)
     {
     	if(scolor == "red") g.setColor(Color.RED);

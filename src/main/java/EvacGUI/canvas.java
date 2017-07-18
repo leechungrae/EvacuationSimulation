@@ -8,12 +8,13 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     //display details
     private final int width=1100;
     private final int height=600;
-    int wall_width = 800;
-    int wall_height = 500;
+    static int wall_width = 800;
+    static int wall_height = 500;
     boolean bg_change=false;
     int color=254,incr=1;
     //a   array
     static ArrayList<ball> ballarray;
+    static ArrayList<My_box> wallarray;
     ArrayList<ball> tempballarray;
     ball temp_ball = new ball(20);
     ball evac_ball = new ball(20);
@@ -21,15 +22,17 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     //my custom box
     
     My_box b1,b2,b3,b4,b5,wall1;
- 
+    
     canvas()
     {
         ballarray=new ArrayList(1);
+        wallarray=new ArrayList(1);
         b1=new My_box(0,0,wall_width,10);//top(-)
         b2=new My_box(0,0,10,wall_height);//top-right(|)
         b3=new My_box(0,0,wall_width+10,10);//bottom-left(-)
         //b4=new My_box(0,0,(wall_width/2)-30,10);//bottom-right(-)
         b5=new My_box(0,0,10,wall_height);//top-left(|)
+        
         wall1=new My_box(400,wall_height-5,60, 20);//top-left(|)
         
         b1.setLocation(0,0);
@@ -43,6 +46,8 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         setPreferredSize(new Dimension(width,height));
         setFocusable(true);
     }
+    
+    
  
     //change to background color dynamically(default:white)
     public void changeBGcolor()
@@ -56,6 +61,13 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             bg_change=true;
         }
     }
+    
+    //add a new wall
+    public static void addDoor(float _door_x, float _door_y, int _door_width, int _door_height){
+    	//add the additional doors
+        My_box temp_box = new My_box((int)_door_x, (int)_door_y, _door_width, _door_height );
+        wallarray.add(temp_box);
+    }
  
     //add a new ball by passing a “ball” class instance
     public void addBall()
@@ -66,7 +78,6 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         temp_ball.y_pos= (int) (Math.random()*wall_height%(wall_height-10));
         ballarray.add(temp_ball);
         base_frame.balladded();
-        
     }
  
     public void removeBall()
@@ -96,6 +107,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
     {
             return ballarray.size();
     }
+    
     public void paintComponent(Graphics g)
     {
         super.paintComponent(g);
@@ -129,8 +141,7 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
         b3.drawBox(g, "red");
         //b4.drawBox(g, "red");
         b5.drawBox(g, "red");
-        wall1.drawBox(g,  "green");
-        
+        //wall1.drawBox(g,  "green");
         
         ball evac_ball = new ball(20);
         try{
@@ -139,11 +150,15 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
             if(time_counter%1000==0&&base_frame.startflag==1){
                 base_frame.timercount();
             }
+            for(My_box temp_box: wallarray){
+            	temp_box.drawBox(g, "green");
+            }
+            
             for(ball temp_ball: ballarray)
             {
                 //drawing the ball using “drawBall(Graphics g,boolean)“.
                 //boolean is for displaying ball’s bounding rectangle which deals with 
-                temp_ball.drawBall(g,false);
+                temp_ball.drawBall(g, false);
               //******************************************************************** check touching part
                 //checking for collision with our movable pad
                 temp_ball.collision(b1);
@@ -156,15 +171,17 @@ public class canvas extends JComponent implements KeyListener,MouseMotionListene
                 //벽 추가 버튼을 누르면 리스트에 둬서 리스트를 차례로 번갈아가면서 확인하는 것으로 바꾸면 됨
                 
                 //checking for exit wall collision with our movable
-                if(temp_ball.collisionExit(wall1)){
-                    tempballarray = ballarray;
-                    evac_ball = temp_ball;
-                    tempballarray.remove(temp_ball);
-                    base_frame.ballremoved();
-                    System.out.println("removed a ball!");
-                    repaint();//calls the paint method
-                } 
-                
+                for(My_box temp_box: wallarray){
+                	if(temp_ball.collisionExit(temp_box)){
+                        tempballarray = ballarray;
+                        evac_ball = temp_ball;
+                        tempballarray.remove(temp_ball);
+                        base_frame.ballremoved();
+                        System.out.println("removed a ball!");
+                        repaint();//calls the paint method
+                    } 
+                	
+                }
               //******************************************************************** check touching part
             }
             if(tempballarray!=null){

@@ -13,11 +13,11 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
     // ********************************************************************
     // define
     canvas draw_panel;
-    JButton b_changebg, b_add, b_remove, b_start, b_doorAdd;
+    JButton b_changebg,b_add,b_remove,b_start,b_doorAdd;
     static int agent_num = 0;
     static int agent_eva = 0;
-    JPanel ui_panel,ui_panel1,ui_panel2,ui_panel3;
-    JLabel agent_number = new JLabel("total agent number :");
+    JPanel ui_panel,ui_panel1,ui_panel2,ui_panel3,ui_panel1_2;
+    JLabel agent_number = new JLabel("total agent number : ");
     static JLabel agent_number2 = new JLabel("0");
     static JLabel agent_number3 = new JLabel("0");
     JLabel layout_agentNum = new JLabel("Input the agent number : ");
@@ -27,21 +27,28 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
     static int timepassed=0;
     static int startflag=0;
     
-    int door_x = 0;
-    int door_y = 0;
-    int door_slideValue = 0;
+    //door settings
+    private float door_x = .0f;
+    private float door_y = .0f;
+    private int door_slideValue = 0;
+    private int door_size = 0;
+    private int door_width = 0;
+    private int door_height = 0;
+    
     static JLabel timerLabel = new JLabel("timer :");
     static JLabel timerLabel2 = new JLabel("0");
     
-    static final int SDOOR_MAX = 1200; //슬라이더의 최대값 (아래 포지션에 따라 최대값은 달라짐)
+    //static int SDOOR_MAX = 1200; //슬라이더의 최대값 (아래 포지션에 따라 최대값은 달라짐)
     
     JRadioButton b_top = new JRadioButton("TOP");
     JRadioButton b_right = new JRadioButton("RIGHT");
     JRadioButton b_bottom = new JRadioButton("BOTTOM");
     JRadioButton b_left = new JRadioButton("LEFT");
+    JRadioButton b_doorBig = new JRadioButton("Big door");
+    JRadioButton b_doorSmall = new JRadioButton("Small door");
     ButtonGroup group = new ButtonGroup();
-    
-    JSlider slider = new JSlider(JSlider.HORIZONTAL,0,SDOOR_MAX,0); // 0~50까지 초기값 10
+    ButtonGroup group1 = new ButtonGroup();
+    JSlider slider = new JSlider(JSlider.HORIZONTAL,0,100,0); // 0~50까지 초기값 10
     
     // ********************************************************************
     // define
@@ -52,20 +59,20 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
     	slider.setPaintTicks(true); // 눈금표시
     	slider.setPaintTrack(true); // slider box 표시
     	
-    	slider.setMajorTickSpacing(200); // 큰 눈금 단위
-    	slider.setMajorTickSpacing(100); // 작은 눈금 단위
+    	slider.setMajorTickSpacing(10); // 큰 눈금 단위
+    	slider.setMajorTickSpacing(5); // 작은 눈금 단위
     	
         // our UI panel which contains gui comps
         ui_panel = new JPanel();
         ui_panel1 = new JPanel();
         ui_panel2 = new JPanel();
+        ui_panel1_2 = new JPanel();
         ui_panel3 = new JPanel();
         
         b_changebg = new JButton("Change Background");
         b_add = new JButton("Add");
         b_remove = new JButton("Remove");
         b_start = new JButton("Start!");
-        
         b_doorAdd = new JButton("Add door");
         
         // add listeners
@@ -79,6 +86,9 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
         b_right.addActionListener(this);
         b_bottom.addActionListener(this);
         b_left.addActionListener(this);
+        b_doorBig.addActionListener(this);
+        b_doorSmall.addActionListener(this);
+        
         setLayout(new FlowLayout());
         draw_panel = new canvas();
         //adding timer
@@ -93,11 +103,15 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
         //ui_panel1.add(b_remove);
         
         //add ui_panel2 which is information
-        ui_panel2.setLayout(new FlowLayout(FlowLayout.LEFT));
+        ui_panel2.setLayout(new FlowLayout(FlowLayout.RIGHT));
         ui_panel2.add(agent_number);
         ui_panel2.add(agent_number2);
         ui_panel2.add(timerLabel);
         ui_panel2.add(timerLabel2);
+        
+        ui_panel1_2.setLayout(new FlowLayout());
+        ui_panel1_2.add(ui_panel1);
+        ui_panel1_2.add(ui_panel2);
         
         //add ui_panel3 which decide the num & position the doors
         group.add(b_top);
@@ -105,13 +119,20 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
         group.add(b_bottom);
         group.add(b_left);
         
+        group1.add(b_doorBig);
+        group1.add(b_doorSmall);
+        
         ui_panel3.setLayout(new FlowLayout(FlowLayout.LEFT));
-        ui_panel3.add(new JLabel("Press the button to make door -> "));
+        ui_panel3.add(new JLabel("Make door!!  door direction : "));
+        ui_panel3.add(new JLabel("door size : "));
+        ui_panel3.add(b_doorBig);
+        ui_panel3.add(b_doorSmall);
+        ui_panel3.add(new JLabel("door position(%) : "));
+        ui_panel3.add(slider);
         ui_panel3.add(b_top);
         ui_panel3.add(b_right);
         ui_panel3.add(b_bottom);
         ui_panel3.add(b_left);
-        ui_panel3.add(slider);
         ui_panel3.add(b_doorAdd);
         
         
@@ -119,18 +140,27 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
         
         //add ui_panel which is the basic UI
         ui_panel.setLayout(new GridLayout(3,1));
-        ui_panel.add(ui_panel2);
-        ui_panel.add(ui_panel1);
+        ui_panel.add(ui_panel1_2);
         ui_panel.add(ui_panel3);
         // adding to our JFrame
         add(draw_panel);
         add(ui_panel);
-        
-        
+
         setSize(1200, 800);
         setVisible(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    
+    public float getDoorX(){
+    	return door_x;
+    }
+    public float getDoorY(){
+    	return door_y;
+    }
+    public float getDoorSize(){
+    	return door_size;
+    }
+    
     public static void main(String[] args) {
         new base_frame();
     }
@@ -166,19 +196,38 @@ public class base_frame extends JFrame implements ActionListener, ChangeListener
                     startflag=1;
             }
         }
+        if(e.getSource() == b_doorBig){
+        	door_size = 50;
+        }else if(e.getSource() == b_doorSmall){
+        	door_size = 30;
+        }
+        
         if(e.getSource() == b_top){
-    		System.out.println("top buttom clicked!");
-    		
+        	door_y = -5; 
+        	door_x = (((float)canvas.wall_width-door_size)/100)*door_slideValue;
+        	door_width = door_size; door_height = 20;
+        	
+        	//System.out.printf("%f, %f, %d, %d", door_x, door_y, door_width, door_height);
     	}else if(e.getSource() == b_right){
-    		
+    		door_x = canvas.wall_width-5;
+    		door_y = (((float)canvas.wall_height-door_size)/100)*door_slideValue;
+    		door_width = 20; door_height = door_size;
     		
     	}else if(e.getSource() == b_bottom){
-    		
+    		door_y = canvas.wall_height-5;
+    		door_x = (((float)canvas.wall_width-door_size)/100)*door_slideValue;
+    		door_width = door_size; door_height = 20;
     		
     	}else if(e.getSource() == b_left){
-    		
+    		door_x = -5;
+    		door_y = (((float)canvas.wall_height-door_size)/100)*door_slideValue;
+    		door_width = 20; door_height = door_size;
     		
     	}
+        if(e.getSource() == b_doorAdd){
+        	canvas.addDoor(door_x, door_y, door_width, door_height);
+        	group.clearSelection();
+        }
     }
     
     public static void balladded() {
